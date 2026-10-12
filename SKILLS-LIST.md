@@ -1,2 +1,2 @@
-- https://github.com/mattpocock/skills/blob/main/skills/productivity/handoff/SKILL.md
+- figma: https://github.com/JetBrains/skills/tree/main/figma
 - frontend-design@claude-plugins-official
