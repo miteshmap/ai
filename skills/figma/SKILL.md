@@ -14,7 +14,7 @@ Use the Figma MCP server for Figma-driven implementation. For setup and debuggin
 ## Figma MCP Integration Rules
 These rules define how to translate Figma inputs into code for this project and must be followed for every Figma-driven change.
 
-### Required flow (do not skip)
+### Required flow (**DO NOT SKIP**)
 1. Run get_design_context first to fetch the structured representation for the exact node(s).
 2. If the response is too large or truncated, run get_metadata to get the high-level node map and then re-fetch only the required node(s) with get_design_context.
 3. Run get_screenshot for a visual reference of the node variant being implemented.
@@ -27,6 +27,9 @@ These rules define how to translate Figma inputs into code for this project and 
 - The screenshot is for orientation only. Never take sizes, gaps or colours from it by eye.
 - Read every value from the get_design_context output (and get_variable_defs for tokens): width, height, gap, padding, margin, border, radius, font family/size/weight/line-height/letter-spacing/case, colour, opacity, shadow, icon size, and layout direction/alignment.
 - Record them as a table per element (element | property | Figma value | project token or raw value used). Include interactive and edge states (hover, focus, disabled, empty, error) and each breakpoint that has its own frame.
+- Build the table for **every** frame (desktop, mobile, and tablet if it exists) before writing code, not only the first one. Do not mark a breakpoint done until its own frame has been fetched and compared.
+- Layout counts as a value: read the parent container's `flex`/`flex-col`, `items-*`, `justify-*`, `gap-*` and padding from the code (e.g. a heading and arrows in `flex items-end gap-[51px] pb-[12px]` share one bottom-aligned row). Never infer alignment or row grouping from the screenshot.
+- When `get_design_context` output is too large and is saved to a temp file, search that file for the element's visible text or `data-node-id` and read the surrounding container markup; do not fall back to the screenshot.
 - Map each value to an existing project token when it is equal. When no token matches, use the raw value and flag it in the table. Do not round or "adjust minimally" without noting it.
 - When a value is missing from the Figma data, say so and ask; do not guess.
 

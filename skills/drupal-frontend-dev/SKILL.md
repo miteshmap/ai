@@ -40,6 +40,15 @@ Baseline: Drupal 10.6+, being migrated to 11. SDC is stable in both. Never use d
 - JS uses `Drupal.behaviors` with `once()` and declares `core/drupal` and `core/once` dependencies. Do not add jQuery unless an existing dependency forces it.
 - Code must pass the project's stylelint, eslint and prettier configs.
 
+## Common CSS/JS pitfalls
+
+- **Media query order:** an `@media` block nested before later declarations in the same rule is overridden by them. Put nested media blocks after the base declarations.
+- **SVG icon colour:** inline SVGs with a hardcoded `fill` ignore `stroke`/`color` hover rules. Use `fill: currentColor` (or `stroke: currentColor` for stroke icons) and set `color` on the parent.
+- **Breakpoints:** use the theme's breakpoint variables, never raw px; check which devices each one includes (e.g. a 992px "md" excludes 768px tablets).
+- **JS-injected markup:** `Drupal.behaviors` and plugins (Owl, Slick, etc.) do not run on HTML injected by your own `fetch`; call the init function after injection, or `Drupal.attachBehaviors(container)`.
+- **Flex children with carousels/sliders:** add `min-width: 0` to the flex child, otherwise the slider's wide inner stage stretches the layout.
+- **Global component rules:** before styling a reused class (e.g. a button modifier), read its global `:hover`/`:focus` rules; they often change border or background and must be overridden too.
+
 ## Debugging checklist
 
 1. **Template not used:** enable Twig debug (`development.services.yml`: `twig.config: { debug: true, auto_reload: true, cache: false }`), read the suggestion comments in the HTML source, rename to the most specific match, rebuild cache (`drush cr`).
@@ -52,6 +61,7 @@ Baseline: Drupal 10.6+, being migrated to 11. SDC is stable in both. Never use d
 
 - Run the project's build, lint and test commands (look in `package.json`, `Makefile`, `ddev` commands). After changing SCSS/JS, rebuild; after changing YAML or templates, `drush cr`.
 - Check the result in a browser at mobile and desktop widths; run Lighthouse or Axe for a11y/performance where available.
+- Measure, don't eyeball: at each design frame width (and tablet, e.g. 768px), read `getBoundingClientRect()` and `getComputedStyle()` for the changed elements and compare with the design values. Screenshots miss few-pixel spacing errors and never show hover/focus, so also read the `:hover`/`:focus` rules or force the state in DevTools.
 - Verify the component works in other render contexts (Layout Builder, Views, different view modes).
 
 ## Reference files (load on demand)
